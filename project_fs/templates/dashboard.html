@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h2>Revenue Over Time </h2>
+    <canvas id="lineChart" width="600" height="300"></canvas>
+    
+    <h2>Revenue by Category</h2>
+    <canvas id="pieChart" width="600" height="300"></canvas>
+    <a href="/upload">Upload Data</a> | <a href="/logout">Logout</a>
+
+    <script>
+        fetch('/api/data')
+            .then(res => res.json())
+            .then(data => {
+                if (data.line.labels.length === 0 || data.pie.labels.length === 0) {
+                    document.body.innerHTML += '<p>No data available for charts.</p>';
+                    return;
+                }
+
+                const ctx1 = document.getElementById('lineChart').getContext('2d');
+                new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: data.line.labels,
+                        datasets: [{
+                            label: 'Revenue Over Time',
+                            data: data.line.values,
+                            borderColor: 'blue',
+                            backgroundColor: 'lightblue',
+                            fill: true
+                        }]
+                    },
+                    options: {responsive: true}
+                });
+
+                const ctx2 = document.getElementById('pieChart').getContext('2d');
+                new Chart(ctx2, {
+                    type: 'pie',
+                    data: {
+                        labels: data.pie.labels,
+                        datasets: [{
+                            label: 'Revenue by Category',
+                            data: data.pie.values,
+                            backgroundColor: ['red', 'green', 'blue', 'orange', 'purple']
+                        }]
+                    },
+                    options: {responsive: true}
+                });
+            });
+    </script>
+</body>
+</html>
